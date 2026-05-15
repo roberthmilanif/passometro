@@ -247,6 +247,18 @@ select.filter {
 .antibiotic-row input { flex: 1; }
 .antibiotic-row input.days-input { width: 80px; flex: none; }
 .antibiotic-row button { flex: none; }
+.atb-day-badge {
+  background: rgba(245,158,11,0.2);
+  color: var(--media);
+  border: 1px solid rgba(245,158,11,0.35);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 36px;
+  text-align: center;
+  white-space: nowrap;
+}
 
 /* Toast */
 .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
