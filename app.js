@@ -4,8 +4,8 @@
 // ============================================================
 
 // CONFIG — substitua com suas credenciais do Supabase
-const SUPABASE_URL  = window.SUPABASE_URL  || 'https://SEU_PROJETO.supabase.co';
-const SUPABASE_KEY  = window.SUPABASE_KEY  || 'SUA_ANON_KEY';
+const SUPABASE_URL  = window.SUPABASE_URL  || 'https://nmvgafaiwdxznzemytzc.supabase.co';
+const SUPABASE_KEY  = window.SUPABASE_KEY  || 'sb_publishable_4Yx89nubqKACma0nBRnxnw_7uxypTRe';
 
 // ---- Init ----
 const { createClient } = supabase;
