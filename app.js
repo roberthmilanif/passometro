@@ -161,7 +161,10 @@ function renderPatients() {
 
 function renderCard(p) {
   const dih  = calcDIH(p.admission_date);
-  const atbs = (p.antibiotics || []);
+  const atbs = (p.antibiotics || []).map(a => ({
+    ...a,
+    dayNum: a.start_date ? (calcDIH(a.start_date) !== null ? calcDIH(a.start_date) + 1 : 1) : (a.days || '')
+  }));
   const pClass = (p.priority || 'Baixa').toLowerCase().replace('é','e');
   const updated = formatDate(p.last_modified || p.created_at);
 
@@ -204,7 +207,7 @@ function renderCard(p) {
               <span class="antibiotic-tag">
                 <i class="fas fa-capsules" style="font-size:10px"></i>
                 ${esc(a.name)}
-                ${a.days ? `<span class="days">D${a.days}</span>` : ''}
+                ${a.dayNum ? `<span class="days">D${a.dayNum}</span>` : ''}
               </span>`).join('')}
           </div>
         </div>` : ''}
@@ -264,7 +267,7 @@ function openModal(patientId) {
     document.getElementById('fieldNextSteps').value    = p.next_steps || '';
     document.getElementById('fieldAuthor').value       = p.author || '';
 
-    (p.antibiotics || []).forEach(a => addAntibioticField(null, a.name, a.days));
+    (p.antibiotics || []).forEach(a => addAntibioticField(null, a.name, a.start_date || ''));
   } else {
     // preenche data de hoje
     document.getElementById('fieldAdmission').value = new Date().toISOString().split('T')[0];
@@ -286,9 +289,9 @@ async function handleFormSubmit(e) {
   // Coleta antibióticos
   const antibiotics = [];
   document.querySelectorAll('.antibiotic-row').forEach(row => {
-    const name = row.querySelector('.atb-name').value.trim();
-    const days = row.querySelector('.atb-days').value.trim();
-    if (name) antibiotics.push({ name, days: days || '' });
+    const name       = row.querySelector('.atb-name').value.trim();
+    const start_date = row.querySelector('.atb-start').value;
+    if (name) antibiotics.push({ name, start_date });
   });
 
   const patient = {
@@ -311,17 +314,28 @@ async function handleFormSubmit(e) {
 // ============================================================
 // ANTIBIOTICS
 // ============================================================
-function addAntibioticField(e, name = '', days = '') {
+function addAntibioticField(e, name = '', start_date = '') {
   const container = document.getElementById('antibioticsContainer');
+  const today  = new Date().toISOString().split('T')[0];
+  const dateVal = start_date || today;
+  const d = calcDIH(dateVal);
+  const dayLabel = d !== null ? 'D' + (d + 1) : 'D1';
   const row = document.createElement('div');
   row.className = 'antibiotic-row';
   row.innerHTML = `
-    <input class="atb-name" type="text" placeholder="Nome do antibiótico" value="${esc(name)}" />
-    <input class="atb-days" type="text" placeholder="D?" class="days-input" value="${esc(days)}" style="width:70px" />
+    <input class="atb-name" type="text" placeholder="ATB (ex: Meropenem)" value="${esc(name)}" style="flex:1" />
+    <input class="atb-start" type="date" value="${esc(dateVal)}" title="Data de início" oninput="updateAtbDay(this)" style="width:145px" />
+    <span class="atb-day-badge">${dayLabel}</span>
     <button type="button" class="btn btn-danger btn-icon btn-sm" onclick="this.parentElement.remove()">
       <i class="fas fa-times"></i>
     </button>`;
   container.appendChild(row);
+}
+
+function updateAtbDay(input) {
+  const badge = input.parentElement.querySelector('.atb-day-badge');
+  const d = calcDIH(input.value);
+  badge.textContent = d !== null ? 'D' + (d + 1) : 'D?';
 }
 
 // ============================================================
