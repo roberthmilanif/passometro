@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passômetro UTI</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div>
+      <h1>🏥 Passômetro</h1>
+      <div class="subtitle">UTI — dados em tempo real</div>
+    </div>
+    <span class="online-badge"><span id="realtimeDot" class="realtime-dot"></span>Online</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-secondary btn-sm" id="refreshBtn">
+      <i class="fas fa-sync-alt"></i> Atualizar
+    </button>
+    <button class="btn btn-secondary btn-sm" id="printBtn">
+      <i class="fas fa-print"></i> Imprimir
+    </button>
+    <button class="btn btn-primary" id="addPatientBtn">
+      <i class="fas fa-plus"></i> Paciente
+    </button>
+  </div>
+</header>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input type="text" id="searchInput" placeholder="Buscar por nome, leito, diagnóstico...">
+  </div>
+  <select class="filter" id="filterPriority">
+    <option value="">Todas Prioridades</option>
+    <option value="Alta">Alta</option>
+    <option value="Média">Média</option>
+    <option value="Baixa">Baixa</option>
+  </select>
+  <select class="filter" id="filterAuthor">
+    <option value="">Todos os Autores</option>
+  </select>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><strong id="statTotal">0</strong> pacientes</div>
+  <div class="stat" style="color:var(--alta)"><strong id="statAlta">0</strong> Alta</div>
+  <div class="stat" style="color:var(--media)"><strong id="statMedia">0</strong> Média</div>
+  <div class="stat" style="color:var(--baixa)"><strong id="statBaixa">0</strong> Baixa</div>
+</div>
+
+<!-- PATIENTS GRID -->
+<div class="patients-grid" id="patientsGrid"></div>
+<div class="empty-state" id="emptyState" style="display:none">
+  <i class="fas fa-bed"></i>
+  <p>Nenhum paciente encontrado</p>
+  <small>Clique em "+ Paciente" para adicionar</small>
+</div>
+
+<!-- MODAL — Add / Edit Patient -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Novo Paciente</h2>
+      <button class="modal-close" id="modalCloseBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <form id="patientForm">
+      <input type="hidden" id="patientIdField">
+      <div class="modal-body">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome do Paciente *</label>
+            <input type="text" id="fieldName" required placeholder="Ex: João Silva">
+          </div>
+          <div class="form-group">
+            <label>Leito</label>
+            <input type="text" id="fieldBed" placeholder="Ex: 01, UTI-05">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Diagnóstico Principal</label>
+            <input type="text" id="fieldDiagnosis" placeholder="Ex: Sepse, SDRA">
+          </div>
+          <div class="form-group">
+            <label>Prioridade</label>
+            <select id="fieldPriority">
+              <option value="Baixa">Baixa</option>
+              <option value="Média">Média</option>
+              <option value="Alta">Alta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data de Internação</label>
+            <input type="date" id="fieldAdmission">
+          </div>
+          <div class="form-group">
+            <label>Autor / Plantonista</label>
+            <input type="text" id="fieldAuthor" placeholder="Dr. Nome">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Condição Atual</label>
+          <textarea id="fieldCondition" placeholder="HD: estável, em desmame ventilatório..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Pendências</label>
+          <textarea id="fieldPending" placeholder="Aguarda TC, Coletar hemoculturas..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Próximos Passos</label>
+          <textarea id="fieldNextSteps" placeholder="Extubação programada, Reavaliação em 6h..."></textarea>
+        </div>
+
+        <!-- Antibióticos -->
+        <div class="form-group">
+          <label>Antibióticos</label>
+          <div class="antibiotics-form">
+            <div id="antibioticsContainer"></div>
+            <button type="button" class="btn btn-secondary btn-sm" id="addAntibioticBtn" style="align-self:flex-start">
+              <i class="fas fa-plus"></i> Adicionar ATB
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+</body>
+</html>
